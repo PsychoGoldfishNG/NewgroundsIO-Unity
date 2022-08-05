@@ -40,16 +40,25 @@ public static class NGIO {
 
 	/** ================================ Public Vars ================================ **/
 
-	public static int MedalScore = -1;
-	public static Dictionary<int, NewgroundsIO.objects.Medal> Medals = null;
-	public static Dictionary<int, NewgroundsIO.objects.ScoreBoard> ScoreBoards = null;
-	public static Dictionary<int, NewgroundsIO.objects.SaveSlot> SaveSlots = null;
-
-	
 	/** ============================= Public Properties ============================= **/
 
+	/// <summary>The user's overall Newgrounds medal score</summary>
+	public static int medalScore { get; private set; } = -1;
+
+	/// <summary>A dictionary of any preloaded medals, keyed on medal ids</summary>
+	public static Dictionary<int, NewgroundsIO.objects.Medal> medals { get; private set; } = null;
+
+	/// <summary>A dictionary of any preloaded medals, keyed on scoreboard ids</summary>
+	public static Dictionary<int, NewgroundsIO.objects.ScoreBoard> scoreBoards { get; private set; } = null;
+	
+	/// <summary>A dictionary of any preloaded medals, keyed on the save slot number</summary>
+	public static Dictionary<int, NewgroundsIO.objects.SaveSlot> saveSlots { get; private set; } = null;
+
+	/// <summary>The last time a component or queue was executed</summary>
+	public static DateTime lastExecution { get; private set; } = DateTime.Now;
+
 	/// <summary>Will be true if we've called Init().</summary>
-	public static bool isReady { get { return Core is not null; }}
+	public static bool isInitialized { get { return ngioCore is not null; }}
 
 	/// <summary>Returns true if we currently have a valid session ID.</summary>
 	public static bool hasSession { get { return session is not null && !session.expired; }}
@@ -58,10 +67,10 @@ public static class NGIO {
 	public static bool hasUser { get { return user is not null; }}
 
 	/// <summary>Will be true if we've finished logging in and preloading data.</summary>
-	public static bool connectionIsReady { get { return lastConnectionStatus == STATUS_READY; }}
+	public static bool isReady { get { return lastConnectionStatus == STATUS_READY; }}
 
 	/// <summary>Contains all information about the current user session.</summary>
-	public static NewgroundsIO.objects.Session session { get { return Core is null ? null : Core.session; }}
+	public static NewgroundsIO.objects.Session session { get { return ngioCore is null ? null : ngioCore.session; }}
 
 	/// <summary>Will be null unless there was an error in our session.</summary>
 	public static NewgroundsIO.objects.Error sessionError { get; private set; } = null;
@@ -85,7 +94,7 @@ public static class NGIO {
 	public static bool loginPageOpen { get; private set; } = false;
 
 	/// <summary>The current version of the Newgrounds.io gateway.</summary>
-	public static string GatewayVersion { get; private set; } = null;
+	public static string gatewayVersion { get; private set; } = null;
 	
 	/// <summary>Stores the last medal that was unlocked.</summary>
 	public static NewgroundsIO.objects.Medal lastMedalUnlocked { get; private set; } = null;
@@ -118,7 +127,7 @@ public static class NGIO {
 	public static bool lastPingSuccess { get; private set; } = true;
 
 	/// <summary>A reference to the NewgroundsIO.Core instance created in Init().</summary>
-	public static NewgroundsIO.Core Core { get; private set; } = null;
+	public static NewgroundsIO.Core ngioCore { get; private set; } = null;
 
 
 	/** =============================== Private Vars ================================ **/
@@ -136,9 +145,6 @@ public static class NGIO {
 	private static bool _sessionReady = false;
 	private static bool _skipLogin = false;
 	private static bool _checkingConnectionStatus = false;
-
-	// Keeps tabs on when we last called the API
-	public static DateTime lastExecution = DateTime.Now;
 
 	/** ============================= Misc Public Methods ============================ **/
 
@@ -159,9 +165,9 @@ public static class NGIO {
 	/// </param>
 	public static void Init(string appID, string aesKey, Dictionary<string,object> options=null)
 	{
-		if (!isReady) {
-			Core = new NewgroundsIO.Core(appID, aesKey);
-			Core.ServerResponse += OnServerResponse;
+		if (!isInitialized) {
+			ngioCore = new NewgroundsIO.Core(appID, aesKey);
+			ngioCore.ServerResponse += OnServerResponse;
 
 			if (!(options is null)) {
 				foreach(var (prop, val) in options)
@@ -176,7 +182,7 @@ public static class NGIO {
 				}
 			}
 
-			Core.debug = _debugMode;
+			ngioCore.debug = _debugMode;
 
 			lastConnectionStatus = STATUS_INITIALIZED;
 		}
@@ -221,7 +227,7 @@ public static class NGIO {
 	/// </summary>
 	public static void LoadAuthorUrl()
 	{
-		Core.LoadComponent(new NewgroundsIO.components.Loader.loadAuthorUrl());
+		ngioCore.LoadComponent(new NewgroundsIO.components.Loader.loadAuthorUrl());
 	}
 
 	/// <summary>
@@ -229,7 +235,7 @@ public static class NGIO {
 	/// </summary>
 	public static void LoadOfficialUrl()
 	{
-		Core.LoadComponent(new NewgroundsIO.components.Loader.loadOfficialUrl());
+		ngioCore.LoadComponent(new NewgroundsIO.components.Loader.loadOfficialUrl());
 	}
 
 	/// <summary>
@@ -237,7 +243,7 @@ public static class NGIO {
 	/// </summary>
 	public static void LoadMoreGames()
 	{
-		Core.LoadComponent(new NewgroundsIO.components.Loader.loadMoreGames());
+		ngioCore.LoadComponent(new NewgroundsIO.components.Loader.loadMoreGames());
 	}
 
 	/// <summary>
@@ -245,7 +251,7 @@ public static class NGIO {
 	/// </summary>
 	public static void LoadNewgrounds()
 	{
-		Core.LoadComponent(new NewgroundsIO.components.Loader.loadNewgrounds());
+		ngioCore.LoadComponent(new NewgroundsIO.components.Loader.loadNewgrounds());
 	}
 
 	/// <summary>
@@ -256,7 +262,7 @@ public static class NGIO {
 	{
 		var component = new NewgroundsIO.components.Loader.loadReferral();
 		component.referral_name = referralName;
-		Core.LoadComponent(component);
+		ngioCore.LoadComponent(component);
 	}
 
 	/** ============================ Public Medal Methods ============================ **/
@@ -267,11 +273,11 @@ public static class NGIO {
 	/// <param name="medalID">The ID of the medal</param>
 	public static NewgroundsIO.objects.Medal GetMedal(int medalID)
 	{
-		if (Medals is null) {
+		if (medals is null) {
 			Debug.LogError("NGIO Error: Can't use GetMedal without setting preloadMedals option to true");
 			return null;
 		}
-		return Medals.ContainsKey(medalID) ? Medals[medalID] : null;
+		return medals.ContainsKey(medalID) ? medals[medalID] : null;
 	}
 
 	/** ========================== Public ScoreBoard Methods ========================= **/
@@ -282,11 +288,11 @@ public static class NGIO {
 	/// <param name="boardID">The ID of the score board</param>
 	public static NewgroundsIO.objects.ScoreBoard GetScoreBoard(int boardID)
 	{
-		if (ScoreBoards is null) {
+		if (scoreBoards is null) {
 			Debug.LogError("NGIO Error: Can't use GetScoreBoard without setting preloadScoreBoards option to true");
 			return null;
 		}
-		return ScoreBoards.ContainsKey(boardID) ? ScoreBoards[boardID] : null;
+		return scoreBoards.ContainsKey(boardID) ? scoreBoards[boardID] : null;
 	}
 
 	/** =========================== Public SaveSlot Methods ========================== **/
@@ -297,11 +303,11 @@ public static class NGIO {
 	/// <param name="slotID">The desired slot number</param>
 	public static NewgroundsIO.objects.SaveSlot GetSaveSlot(int slotID)
 	{
-		if (SaveSlots is null) {
+		if (saveSlots is null) {
 			Debug.LogError("NGIO Error: Can't use GetSaveSlot without setting preloadSaveSlots option to true");
 			return null;
 		}
-		return SaveSlots.ContainsKey(slotID) ? SaveSlots[slotID] : null;
+		return saveSlots.ContainsKey(slotID) ? saveSlots[slotID] : null;
 	}
 
 	/// <summary>
@@ -311,7 +317,7 @@ public static class NGIO {
 	{
 		short total = 0;
 
-		foreach(var (id, slot) in SaveSlots) {
+		foreach(var (id, slot) in saveSlots) {
 			if (slot.hasData) total++; 
 		}
 
@@ -408,7 +414,7 @@ public static class NGIO {
 		if (elapsed.Seconds >= 30) {
 			Debug.Log("ping");
 			lastExecution = DateTime.Now;
-			yield return Core.ExecuteComponent(new NewgroundsIO.components.Gateway.ping());
+			yield return ngioCore.ExecuteComponent(new NewgroundsIO.components.Gateway.ping());
 		}
 	}
 
@@ -421,7 +427,7 @@ public static class NGIO {
 	/// <param name="callback">A function to run when the file has been loaded</param>
 	public static IEnumerator GetSaveSlotData(int slotID, Action<string> callback)
 	{
-		if (SaveSlots is null) {
+		if (saveSlots is null) {
 			Debug.LogError("GetSaveSlotData data called without any preloaded save slots.");
 			callback(null);
 		}
@@ -436,10 +442,11 @@ public static class NGIO {
 	/// Loads the actual save file from a save slot and returns the save slot to an optional callback function when complete.
 	/// </summary>
 	/// <param name="slotID">The slot number to save to.</param>
+	/// <param name="data">The (serialized) data you want to save.</param>
 	/// <param name="callback">A function to run when the file finished saving.</param>
 	public static IEnumerator SetSaveSlotData(int slotID, string data, Action<NewgroundsIO.objects.SaveSlot> callback=null)
 	{
-		if (SaveSlots is null) {
+		if (saveSlots is null) {
 			Debug.LogError("SetSaveSlotData data called without any preloaded save slots.");
 			if (callback is not null) callback(null);
 			yield break;
@@ -467,7 +474,7 @@ public static class NGIO {
 	{
 		var component = new NewgroundsIO.components.Event.logEvent();
 		component.event_name = eventName;
-		yield return Core.ExecuteComponent(component);
+		yield return ngioCore.ExecuteComponent(component);
 		
 		if (callback is not null) callback(lastLoggedEvent);
 	}
@@ -482,7 +489,7 @@ public static class NGIO {
 	{
 		var component = new NewgroundsIO.components.Gateway.getDatetime();
 
-		yield return Core.ExecuteComponent(component);
+		yield return ngioCore.ExecuteComponent(component);
 
 		if (callback is not null) callback(lastDateTime,lastTimeStamp);
 	}
@@ -496,7 +503,7 @@ public static class NGIO {
 	/// <param name="callback">A function to run when the medal has unlocked.</param>
 	public static IEnumerator UnlockMedal(int medalID, Action<NewgroundsIO.objects.Medal> callback=null)
 	{
-		if (Medals is null) {
+		if (medals is null) {
 			Debug.LogError("UnlockMedal called without any preloaded medals.");
 			if (callback is not null) callback(null);
 			yield break;
@@ -524,7 +531,7 @@ public static class NGIO {
 	/// <param name="callback">A function to run when the score has posted.</param>
 	public static IEnumerator PostScore(int boardID, int value, string tag=null, Action<NewgroundsIO.objects.ScoreBoard,NewgroundsIO.objects.Score> callback=null)
 	{
-		if (ScoreBoards is null) {
+		if (scoreBoards is null) {
 			Debug.LogError("PostScore called without any preloaded scoreboards.");
 			if (callback is not null) callback(null, null);
 			yield break;
@@ -551,7 +558,7 @@ public static class NGIO {
 	/// <param name="callback">A function to run when the scores have been loaded.</param>
 	public static IEnumerator GetScores(int boardID, string period="D", string tag=null, bool social=false, Action<NewgroundsIO.objects.ScoreBoard, List<NewgroundsIO.objects.Score>, string, string, bool> callback=null)
 	{
-		if (ScoreBoards is null) {
+		if (scoreBoards is null) {
 			Debug.LogError("GetScores called without any preloaded scoreboards.");
 			if (callback is not null) callback(null, null, period, tag, social);
 			yield break;
@@ -575,19 +582,19 @@ public static class NGIO {
 		
 		var component = new NewgroundsIO.components.App.getCurrentVersion();
 		component.version = _version;
-		Core.QueueComponent(component);
+		ngioCore.QueueComponent(component);
 
-		Core.QueueComponent(new NewgroundsIO.components.Gateway.getVersion());
-		Core.QueueComponent(new NewgroundsIO.components.Gateway.getDatetime());
+		ngioCore.QueueComponent(new NewgroundsIO.components.Gateway.getVersion());
+		ngioCore.QueueComponent(new NewgroundsIO.components.Gateway.getDatetime());
 
 		if (_autoLogNewView) {
-			Core.QueueComponent(new NewgroundsIO.components.App.logView());
+			ngioCore.QueueComponent(new NewgroundsIO.components.App.logView());
 		}
 		if (_checkHostLicense) {
-			Core.QueueComponent(new NewgroundsIO.components.App.getHostLicense());
+			ngioCore.QueueComponent(new NewgroundsIO.components.App.getHostLicense());
 		}
 
-		yield return Core.ExecuteQueue();
+		yield return ngioCore.ExecuteQueue();
 
 		lastConnectionStatus = STATUS_LOCAL_VERSION_CHECKED;
 
@@ -602,15 +609,15 @@ public static class NGIO {
 	private static IEnumerator PreloadItems() {
 		
 		if (_preloadMedals) {
-			Core.QueueComponent(new NewgroundsIO.components.Medal.getMedalScore());
-			Core.QueueComponent(new NewgroundsIO.components.Medal.getList());
+			ngioCore.QueueComponent(new NewgroundsIO.components.Medal.getMedalScore());
+			ngioCore.QueueComponent(new NewgroundsIO.components.Medal.getList());
 		}
 		if (_preloadScoreBoards) {
-			Core.QueueComponent(new NewgroundsIO.components.ScoreBoard.getBoards());
+			ngioCore.QueueComponent(new NewgroundsIO.components.ScoreBoard.getBoards());
 		}
-		if (!(user is null) && _preloadSaveSlots) Core.QueueComponent(new NewgroundsIO.components.CloudSave.loadSlots());
+		if (!(user is null) && _preloadSaveSlots) ngioCore.QueueComponent(new NewgroundsIO.components.CloudSave.loadSlots());
 
-		if (Core.hasQueue) yield return Core.ExecuteQueue();
+		if (ngioCore.hasQueue) yield return ngioCore.ExecuteQueue();
 
 		lastConnectionStatus = STATUS_ITEMS_PRELOADED;
 	}
@@ -700,9 +707,9 @@ public static class NGIO {
 				if (!result.success) return;
 
 				// Store the loaded cloud saves in our dictionary so we can get them by slot number
-				SaveSlots = new Dictionary<int, NewgroundsIO.objects.SaveSlot>();
+				saveSlots = new Dictionary<int, NewgroundsIO.objects.SaveSlot>();
 				CloudSaveLoadSlotsResult.slots.ForEach(slot => {
-					SaveSlots[slot.id] = slot.clone();
+					saveSlots[slot.id] = slot.clone();
 				});
 
 				break;
@@ -713,9 +720,9 @@ public static class NGIO {
 				if (!result.success) return;
 
 				// Save, or replace, the slot in our dictionary so it can be retrieved by it's slot number
-				if (!(SaveSlots is null)) {
+				if (!(saveSlots is null)) {
 					var slot = CloudSaveLoadSlotResult.slot;
-					SaveSlots[slot.id] = slot.clone(SaveSlots.ContainsKey(slot.id) ? SaveSlots[slot.id] : null);
+					saveSlots[slot.id] = slot.clone(saveSlots.ContainsKey(slot.id) ? saveSlots[slot.id] : null);
 				}
 
 				break;
@@ -729,10 +736,10 @@ public static class NGIO {
 				}
 
 				// Save, or replace, the slot in our dictionary so it can be retrieved by it's slot number
-				if (!(SaveSlots is null)) {
+				if (!(saveSlots is null)) {
 					var slot = CloudSaveSaveSlotResult.slot;
-					SaveSlots[slot.id] = slot.clone(SaveSlots.ContainsKey(slot.id) ? SaveSlots[slot.id] : null);
-					lastSaveSlotSaved = SaveSlots[slot.id];
+					saveSlots[slot.id] = slot.clone(saveSlots.ContainsKey(slot.id) ? saveSlots[slot.id] : null);
+					lastSaveSlotSaved = saveSlots[slot.id];
 				}
 
 				break;
@@ -743,9 +750,9 @@ public static class NGIO {
 				if (!result.success) return;
 
 				// Save, or replace, the slot in our dictionary so it can be retrieved by it's slot number
-				if (!(SaveSlots is null)) {
+				if (!(saveSlots is null)) {
 					var slot = CloudSaveClearSlotResult.slot;
-					SaveSlots[slot.id] = slot.clone(SaveSlots.ContainsKey(slot.id) ? SaveSlots[slot.id] : null);
+					saveSlots[slot.id] = slot.clone(saveSlots.ContainsKey(slot.id) ? saveSlots[slot.id] : null);
 				}
 
 				break;
@@ -785,11 +792,11 @@ public static class NGIO {
 
 				var GatewayGetVersionResult = result as NewgroundsIO.results.Gateway.getVersion;
 				if (!result.success) {
-					GatewayVersion = null;
+					gatewayVersion = null;
 					return;
 				}
 
-				GatewayVersion = GatewayGetVersionResult.version;
+				gatewayVersion = GatewayGetVersionResult.version;
 
 				break;
 
@@ -808,9 +815,9 @@ public static class NGIO {
 				if (!result.success) return;
 
 				// Store the loaded medals in our dictionary so we can get them by their ID
-				Medals = new Dictionary<int, NewgroundsIO.objects.Medal>();
+				medals = new Dictionary<int, NewgroundsIO.objects.Medal>();
 				MedalGetListResult.medals.ForEach(medal => {
-					Medals[medal.id] = medal.clone();
+					medals[medal.id] = medal.clone();
 				});
 
 				break;
@@ -824,13 +831,13 @@ public static class NGIO {
 				}
 
 				// Save, or replace, the medal in our dictionary so it can be retrieved by it's ID
-				if (!(Medals is null)) {
-					Medals[MedalUnlockResult.medal.id] = MedalUnlockResult.medal.clone();
-					lastMedalUnlocked = Medals[MedalUnlockResult.medal.id];
+				if (!(medals is null)) {
+					medals[MedalUnlockResult.medal.id] = MedalUnlockResult.medal.clone();
+					lastMedalUnlocked = medals[MedalUnlockResult.medal.id];
 				}
 
 				// Record the current user's medal score
-				MedalScore = MedalUnlockResult.medal_score;
+				medalScore = MedalUnlockResult.medal_score;
 				break;
 
 			case "Medal.getMedalScore":
@@ -839,7 +846,7 @@ public static class NGIO {
 				if (!result.success) return;
 
 				// Record the current user's medal score
-				MedalScore = MedalGetScoreResult.medal_score;
+				medalScore = MedalGetScoreResult.medal_score;
 
 				break;
 
@@ -850,10 +857,10 @@ public static class NGIO {
 				if (!result.success) return;
 
 				// Store the loaded boards in our dictionary so we can get them by their ID
-				ScoreBoards = new Dictionary<int, NewgroundsIO.objects.ScoreBoard>();
+				scoreBoards = new Dictionary<int, NewgroundsIO.objects.ScoreBoard>();
 				ScoreBoardGetBoardsResult.scoreboards .ForEach(board => {
 					Debug.Log(board.ToJSON());
-					ScoreBoards[board.id] = board.clone();
+					scoreBoards[board.id] = board.clone();
 				});
 
 				break;

@@ -75,7 +75,7 @@ namespace NewgroundsIO {
 
 		/// <summary>Constructor</summary>
 		/// <param name="appID">The App ID from your Newgrounds project App Settings page.</param>
-		/// <param name="appID">The AES-128 encryption key from your Newgrounds project App Settings page.</param>
+		/// <param name="aesKey">The AES-128 encryption key from your Newgrounds project App Settings page.</param>
 		public Core(string appID, string aesKey)
 		{
 			this.appID = appID;
@@ -747,7 +747,7 @@ namespace NewgroundsIO {
 	/** ============================ Base Component Class ============================ **/
 
 	/// <summary>A base for every component model.</summary>
-	public class BaseComponent : BaseObject {
+	public class BaseComponent : NewgroundsIO.BaseObject {
 
 		/// <summary>Components that require encryption will set this to true</summary>
 		public bool __isSecure = false;
@@ -773,7 +773,7 @@ namespace NewgroundsIO {
 	/** ============================= Base Result Class ============================== **/
 
 	/// <summary>A base for every result model.</summary>
-	public class BaseResult : BaseObject {
+	public class BaseResult : NewgroundsIO.BaseObject {
 
 		/// <summary>If the component was successful, this will be true. If not, you can check the error property for details.</summary>
 		public bool success { get; set; } = false;
@@ -802,7 +802,7 @@ namespace NewgroundsIO {
 	/// <summary>
 	/// This object is a wrapper for serializing components using their string name, and property objects.
 	/// </summary>
-	public class ExecuteWrapper : BaseObject {
+	public class ExecuteWrapper : NewgroundsIO.BaseObject {
 
 		/// <summary>The component object we're wrapping</summary>
 		public NewgroundsIO.BaseComponent component { get; set; } = null;
