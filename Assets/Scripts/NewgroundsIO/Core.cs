@@ -40,7 +40,7 @@ namespace NewgroundsIO {
 		/// <summary>The App ID from your App Settings page.</summary>
 		public string appID { get; private set; }
 
-	    /// <summary>Set to true to enable debug mode.</summary>
+		/// <summary>Set to true to enable debug mode.</summary>
 		public bool debug {get; set;} = false;
 
 		/// <summary>Returns the host domain in WebGL builds.</summary>
@@ -65,9 +65,9 @@ namespace NewgroundsIO {
 		private byte[] aesKey;
 
 		// Holds any echo text to be attached to the next component/queue execution.
-	    private string _echo = null;
+		private string _echo = null;
 
-	    // Holds the host domain in WebGL Builds.
+		// Holds the host domain in WebGL Builds.
 		private string _host = null;
 
 
@@ -690,47 +690,47 @@ namespace NewgroundsIO {
 
 		/// <summary>Encodes a value into JSON string.</summary>
 		/// <param name="val">Any value you need to encode.</param>
-    	public string _getValueJSON(object val)
-    	{
-    		// simple null string
-    		if (val is null) return "null";
+		public string _getValueJSON(object val)
+		{
+			// simple null string
+			if (val is null) return "null";
 
-    		// object models 
-    		if (val is NewgroundsIO.BaseObject) {
+			// object models 
+			if (val is NewgroundsIO.BaseObject) {
 
-    			var objVal = val as NewgroundsIO.BaseObject;
-    			return objVal.ToJSON();
+				var objVal = val as NewgroundsIO.BaseObject;
+				return objVal.ToJSON();
 
-    		// booleans
-    		} else if (val is bool) {
+			// booleans
+			} else if (val is bool) {
 
-    			return (bool) val ? "true":"false";
+				return (bool) val ? "true":"false";
 
-    		// strings
-    		} else if (val is string) {
+			// strings
+			} else if (val is string) {
 
-    			string stringVal = val as string;
-    			return "\""+stringVal.Replace("\"", "\\\"")+"\"";
+				string stringVal = val as string;
+				return "\""+stringVal.Replace("\"", "\\\"")+"\"";
 
-    		// lists
-    		} else if (val.GetType().IsGenericType && val is IEnumerable) {
+			// lists
+			} else if (val.GetType().IsGenericType && val is IEnumerable) {
 
-    			string _out = "[";
-    			bool _first = true;
-    			var _enum = ((IEnumerable) val).GetEnumerator();
-    			while (_enum.MoveNext()) {
-    				
-    				if (!_first) {
-    					_out += ",";
-    				} else {
-    					_first = false;
-    				}
-    				_out += _getValueJSON(_enum.Current);
-    			}
-    			_out += "]";
-    			return _out;
+				string _out = "[";
+				bool _first = true;
+				var _enum = ((IEnumerable) val).GetEnumerator();
+				while (_enum.MoveNext()) {
+					
+					if (!_first) {
+						_out += ",";
+					} else {
+						_first = false;
+					}
+					_out += _getValueJSON(_enum.Current);
+				}
+				_out += "]";
+				return _out;
 
-    		// numbers
+			// numbers
 			} else if (this._numberTypes.Contains(val.GetType())) {
 
 				return val.ToString();
@@ -740,7 +740,7 @@ namespace NewgroundsIO {
 			// we don't use any other types, so shoot a warning and return a null string
 			Debug.LogWarning("NewgroundsIO: Unsupported type: "+val.GetType());
 			return "null";
-    	}
+		}
 	}
 
 
