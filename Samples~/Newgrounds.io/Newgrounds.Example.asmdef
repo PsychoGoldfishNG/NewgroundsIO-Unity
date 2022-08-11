@@ -1,0 +1,15 @@
+{
+    "name": "Newgrounds.Example",
+    "references": [
+        "GUID:9cd625460f2eaf54db03dca4bdacba6b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
