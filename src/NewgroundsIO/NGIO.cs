@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.InteropServices;
 
 /// <summary>
 /// A static wrapper for the NewgroundsIO library.
@@ -145,6 +146,16 @@ public static class NGIO {
 	private static bool _sessionReady = false;
 	private static bool _skipLogin = false;
 	private static bool _checkingConnectionStatus = false;
+
+	// External events
+
+	// tells the Newgrounds page a medal was unlocked so it can highlight in real time
+	[DllImport("__Internal")]
+	private static extern void OnMedalUnlocked(int medal_id);
+
+	// tells the Newgrounds page a score was posted so the current board can refresh
+	[DllImport("__Internal")]
+	private static extern void OnScorePosted(int board_id);
 
 	/** ============================= Misc Public Methods ============================ **/
 
@@ -838,6 +849,8 @@ public static class NGIO {
 
 				// Record the current user's medal score
 				medalScore = MedalUnlockResult.medal_score;
+
+				OnMedalUnlocked(MedalUnlockResult.medal.id);
 				break;
 
 			case "Medal.getMedalScore":
@@ -876,6 +889,7 @@ public static class NGIO {
 				lastScorePosted = ScoreBoardPostScoreResult.score;
 				lastBoardPosted = GetScoreBoard(ScoreBoardPostScoreResult.scoreboard.id);
 
+				OnScorePosted(ScoreBoardPostScoreResult.scoreboard.id);
 				break;
 
 			case "ScoreBoard.getScores":
