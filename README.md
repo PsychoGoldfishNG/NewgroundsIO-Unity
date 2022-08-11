@@ -1,8 +1,22 @@
 # NewgroundsIO-Unity
 A C# Library for accessing the Newgrounds.io API from Unity games.
+Available from Unity 2021.3.
 
 # Installation
-Simply *[Download the Repo](https://github.com/PsychoGoldfishNG/NewgroundsIO-Unity/archive/refs/heads/main.zip)* and copy the contents of the *_NewgroundsIO-Unity-main/Assets_* folder into your Unity Project's Assets folder.
+
+In Unity, open the Package Manager (Window > Package Manager).
+
+## Git
+
+If you use *[git](https://git-scm.com/)*, you may add the package directly with **[+] > Add package from git URL…** using the HTTPS repository clone url.
+
+When there is an update, you may update directly from the Package Manager.
+
+## Local
+
+Otherwise, *[Download the Repo](https://github.com/PsychoGoldfishNG/NewgroundsIO-Unity/archive/refs/heads/main.zip)*, extract the contents and add the package with **[+] > Add package from disk…** and locate the `package.json` file.
+
+Multiple projects may link to the same local package.
 
 # Learn More!
 Learn how to use the library, and access API docs in the [wiki](https://github.com/PsychoGoldfishNG/NewgroundsIO-Unity/wiki)!
