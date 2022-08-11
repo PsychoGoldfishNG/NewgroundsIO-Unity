@@ -1,0 +1,24 @@
+{
+    "name": "Newgrounds.Runtime",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "io.newgrounds.unity",
+            "expression": "0",
+            "define": "NEWGROUNDS"
+        },
+        {
+            "name": "Unity",
+            "expression": "2021.3",
+            "define": "UNITY_2021_3_OR_NEWER"
+        }
+    ],
+    "noEngineReferences": false
+}
