@@ -1,0 +1,33 @@
+{
+  "name": "io.newgrounds.unity",
+  "version": "2.0.0",
+  "displayName": "Newgrounds.io",
+  "description": "A C# Library for accessing the Newgrounds.io API from Unity games.",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://github.com/PsychoGoldfishNG/NewgroundsIO-Unity/wiki",
+  "changelogUrl": "https://github.com/PsychoGoldfishNG/NewgroundsIO-Unity/commits",
+  "keywords": [
+    "newgrounds",
+    "unity",
+    "medals",
+    "scores",
+    "cloud-saves",
+    "referrals"
+  ],
+  "author": {
+    "name": "PsychoGoldfishNG",
+    "url": "https://discord.gg/wcsCk2ErhH"
+  },
+  "samples": [
+    {
+      "displayName": "Example",
+      "description": "This demo shows how to get user's logged in, how to make save slots, scoreboards, unlock medals and custom events and referrals.",
+      "path": "Samples~/Newgrounds.io/Example"
+    }
+  ],
+  "dependencies": {
+    "com.unity.textmeshpro": "3.0.6"
+  },
+  "type": "library"
+}
