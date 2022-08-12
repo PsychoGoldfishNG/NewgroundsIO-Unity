@@ -1,6 +1,8 @@
 # NewgroundsIO-Unity
 A C# Library for accessing the Newgrounds.io API from Unity games.
 
+**Note:** This library was built in Unity 2022.1.6f1.  If you are using older versions, this library may not work.  You can find an older library at https://bitbucket.org/newgrounds/newgrounds.io-for-unity-c/src/master/
+
 # Installation
 Simply *[Download the Repo](https://github.com/PsychoGoldfishNG/NewgroundsIO-Unity/archive/refs/heads/main.zip)* and copy the contents of the *_NewgroundsIO-Unity-main/Assets_* folder into your Unity Project's Assets folder.
 
