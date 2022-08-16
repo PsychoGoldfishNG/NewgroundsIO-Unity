@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 /// <summary>
 /// A static wrapper for the NewgroundsIO library.
@@ -13,22 +14,22 @@ public static class NGIO {
 	/** ================================ Constants ================================= **/
 
 	// preloading statuses
-	public const string STATUS_INITIALIZED				= "initialized";
+	public const string STATUS_INITIALIZED			= "initialized";
 	public const string STATUS_CHECKING_LOCAL_VERSION	= "checking-local-version";
 	public const string STATUS_LOCAL_VERSION_CHECKED	= "local-version-checked";
-	public const string STATUS_PRELOADING_ITEMS			= "preloading-items";
-	public const string STATUS_ITEMS_PRELOADED			= "items-preloaded";
-	public const string STATUS_READY					= "ready";
+	public const string STATUS_PRELOADING_ITEMS		= "preloading-items";
+	public const string STATUS_ITEMS_PRELOADED		= "items-preloaded";
+	public const string STATUS_READY			= "ready";
 
 	// aliases from SessionState
 	public const string STATUS_SESSION_UNINITIALIZED	= NewgroundsIO.SessionState.SESSION_UNINITIALIZED;
 	public const string STATUS_WAITING_FOR_SERVER		= NewgroundsIO.SessionState.WAITING_FOR_SERVER;
-	public const string STATUS_LOGIN_REQUIRED			= NewgroundsIO.SessionState.LOGIN_REQUIRED;
-	public const string STATUS_WAITING_FOR_USER			= NewgroundsIO.SessionState.WAITING_FOR_USER;
-	public const string STATUS_LOGIN_CANCELLED			= NewgroundsIO.SessionState.LOGIN_CANCELLED;
-	public const string STATUS_LOGIN_SUCCESSFUL			= NewgroundsIO.SessionState.LOGIN_SUCCESSFUL;
-	public const string STATUS_LOGIN_FAILED				= NewgroundsIO.SessionState.LOGIN_FAILED;
-	public const string STATUS_USER_LOGGED_OUT			= NewgroundsIO.SessionState.USER_LOGGED_OUT;
+	public const string STATUS_LOGIN_REQUIRED		= NewgroundsIO.SessionState.LOGIN_REQUIRED;
+	public const string STATUS_WAITING_FOR_USER		= NewgroundsIO.SessionState.WAITING_FOR_USER;
+	public const string STATUS_LOGIN_CANCELLED		= NewgroundsIO.SessionState.LOGIN_CANCELLED;
+	public const string STATUS_LOGIN_SUCCESSFUL		= NewgroundsIO.SessionState.LOGIN_SUCCESSFUL;
+	public const string STATUS_LOGIN_FAILED			= NewgroundsIO.SessionState.LOGIN_FAILED;
+	public const string STATUS_USER_LOGGED_OUT		= NewgroundsIO.SessionState.USER_LOGGED_OUT;
 	public const string STATUS_SERVER_UNAVAILABLE		= NewgroundsIO.SessionState.SERVER_UNAVAILABLE;
 	public const string STATUS_EXCEEDED_MAX_ATTEMPTS	= NewgroundsIO.SessionState.EXCEEDED_MAX_ATTEMPTS;
 
@@ -148,13 +149,18 @@ public static class NGIO {
 	private static bool _checkingConnectionStatus = false;
 
 	// External events
+	#if !UNITY_EDITOR
+	#define UNITY_BUILD
+	#endif
 
 	// tells the Newgrounds page a medal was unlocked so it can highlight in real time
-	[DllImport("__Internal")]
+	// only used in WebGL builds
+	[DllImport("__Internal"), Conditional("UNITY_BUILD"), Conditional("UNITY_WEBGL")]
 	private static extern void OnMedalUnlocked(int medal_id);
 
 	// tells the Newgrounds page a score was posted so the current board can refresh
-	[DllImport("__Internal")]
+	// only used in WebGL builds
+	[DllImport("__Internal"), Conditional("UNITY_BUILD"), Conditional("UNITY_WEBGL")]
 	private static extern void OnScorePosted(int board_id);
 
 	/** ============================= Misc Public Methods ============================ **/
@@ -183,8 +189,8 @@ public static class NGIO {
 			if (!(options is null)) {
 				foreach(var (prop, val) in options)
 				{
-					if (prop == "version")				_version = (string)val;
-					if (prop == "debugMode")			_debugMode = (bool)val;
+					if (prop == "version")			_version = (string)val;
+					if (prop == "debugMode")		_debugMode = (bool)val;
 					if (prop == "checkHostLicense")		_checkHostLicense = (bool)val;
 					if (prop == "autoLogNewView")		_autoLogNewView = (bool)val;
 					if (prop == "preloadMedals")		_preloadMedals = (bool)val;
@@ -218,7 +224,7 @@ public static class NGIO {
 			loginPageOpen = true;
 			session.OpenLoginPage();
 		} else {
-			Debug.LogWarning("loginPageOpen is true. Use CancelLogin to reset.");
+			UnityEngine.Debug.LogWarning("loginPageOpen is true. Use CancelLogin to reset.");
 		}
 	}
 
@@ -285,7 +291,7 @@ public static class NGIO {
 	public static NewgroundsIO.objects.Medal GetMedal(int medalID)
 	{
 		if (medals is null) {
-			Debug.LogError("NGIO Error: Can't use GetMedal without setting preloadMedals option to true");
+			UnityEngine.Debug.LogError("NGIO Error: Can't use GetMedal without setting preloadMedals option to true");
 			return null;
 		}
 		return medals.ContainsKey(medalID) ? medals[medalID] : null;
@@ -300,7 +306,7 @@ public static class NGIO {
 	public static NewgroundsIO.objects.ScoreBoard GetScoreBoard(int boardID)
 	{
 		if (scoreBoards is null) {
-			Debug.LogError("NGIO Error: Can't use GetScoreBoard without setting preloadScoreBoards option to true");
+			UnityEngine.Debug.LogError("NGIO Error: Can't use GetScoreBoard without setting preloadScoreBoards option to true");
 			return null;
 		}
 		return scoreBoards.ContainsKey(boardID) ? scoreBoards[boardID] : null;
@@ -315,7 +321,7 @@ public static class NGIO {
 	public static NewgroundsIO.objects.SaveSlot GetSaveSlot(int slotID)
 	{
 		if (saveSlots is null) {
-			Debug.LogError("NGIO Error: Can't use GetSaveSlot without setting preloadSaveSlots option to true");
+			UnityEngine.Debug.LogError("NGIO Error: Can't use GetSaveSlot without setting preloadSaveSlots option to true");
 			return null;
 		}
 		return saveSlots.ContainsKey(slotID) ? saveSlots[slotID] : null;
@@ -423,7 +429,6 @@ public static class NGIO {
 
 		TimeSpan elapsed = DateTime.Now.Subtract(lastExecution);
 		if (elapsed.Seconds >= 30) {
-			Debug.Log("ping");
 			lastExecution = DateTime.Now;
 			yield return ngioCore.ExecuteComponent(new NewgroundsIO.components.Gateway.ping());
 		}
@@ -439,7 +444,7 @@ public static class NGIO {
 	public static IEnumerator GetSaveSlotData(int slotID, Action<string> callback)
 	{
 		if (saveSlots is null) {
-			Debug.LogError("GetSaveSlotData data called without any preloaded save slots.");
+			UnityEngine.Debug.LogError("GetSaveSlotData data called without any preloaded save slots.");
 			callback(null);
 		}
 
@@ -458,14 +463,14 @@ public static class NGIO {
 	public static IEnumerator SetSaveSlotData(int slotID, string data, Action<NewgroundsIO.objects.SaveSlot> callback=null)
 	{
 		if (saveSlots is null) {
-			Debug.LogError("SetSaveSlotData data called without any preloaded save slots.");
+			UnityEngine.Debug.LogError("SetSaveSlotData data called without any preloaded save slots.");
 			if (callback is not null) callback(null);
 			yield break;
 		}
 		
 		var slot = GetSaveSlot(slotID);
 		if (slot is null) {
-			Debug.LogError("Slot #"+slotID+" does not exist.");
+			UnityEngine.Debug.LogError("Slot #"+slotID+" does not exist.");
 			if (callback is not null) callback(null);
 			yield break;
 		}
@@ -515,13 +520,13 @@ public static class NGIO {
 	public static IEnumerator UnlockMedal(int medalID, Action<NewgroundsIO.objects.Medal> callback=null)
 	{
 		if (medals is null) {
-			Debug.LogError("UnlockMedal called without any preloaded medals.");
+			UnityEngine.Debug.LogError("UnlockMedal called without any preloaded medals.");
 			if (callback is not null) callback(null);
 			yield break;
 		}
 		var medal = GetMedal(medalID);
 		if (medal is null) {
-			Debug.LogError("Medal #"+medalID+" does not exist.");
+			UnityEngine.Debug.LogError("Medal #"+medalID+" does not exist.");
 			if (callback is not null) callback(null);
 			yield break;
 		}
@@ -543,13 +548,13 @@ public static class NGIO {
 	public static IEnumerator PostScore(int boardID, int value, string tag=null, Action<NewgroundsIO.objects.ScoreBoard,NewgroundsIO.objects.Score> callback=null)
 	{
 		if (scoreBoards is null) {
-			Debug.LogError("PostScore called without any preloaded scoreboards.");
+			UnityEngine.Debug.LogError("PostScore called without any preloaded scoreboards.");
 			if (callback is not null) callback(null, null);
 			yield break;
 		}
 		var board = GetScoreBoard(boardID);
 		if (board is null) {
-			Debug.LogError("ScoreBoard #"+boardID+" does not exist.");
+			UnityEngine.Debug.LogError("ScoreBoard #"+boardID+" does not exist.");
 			if (callback is not null) callback(null, null);
 			yield break;
 		}
@@ -570,13 +575,13 @@ public static class NGIO {
 	public static IEnumerator GetScores(int boardID, string period="D", string tag=null, bool social=false, Action<NewgroundsIO.objects.ScoreBoard, List<NewgroundsIO.objects.Score>, string, string, bool> callback=null)
 	{
 		if (scoreBoards is null) {
-			Debug.LogError("GetScores called without any preloaded scoreboards.");
+			UnityEngine.Debug.LogError("GetScores called without any preloaded scoreboards.");
 			if (callback is not null) callback(null, null, period, tag, social);
 			yield break;
 		}
 		var board = GetScoreBoard(boardID);
 		if (board is null) {
-			Debug.LogError("ScoreBoard #"+boardID+" does not exist.");
+			UnityEngine.Debug.LogError("ScoreBoard #"+boardID+" does not exist.");
 			if (callback is not null) callback(null, null, period, tag, social);
 			yield break;
 		}
@@ -610,7 +615,7 @@ public static class NGIO {
 		lastConnectionStatus = STATUS_LOCAL_VERSION_CHECKED;
 
 		if (!legalHost) {
-			Debug.LogWarning("This host has been blocked fom hosting this game!");
+			UnityEngine.Debug.LogWarning("This host has been blocked fom hosting this game!");
 			_sessionReady = true;
 			lastConnectionStatus = STATUS_ITEMS_PRELOADED;
 		}
@@ -668,7 +673,7 @@ public static class NGIO {
 	{
 		if (!result.success)
 		{
-			Debug.LogError(result.error.message+" \ncode("+result.error.code+")");
+			UnityEngine.Debug.LogError(result.error.message+" \ncode("+result.error.code+")");
 		}
 
 		switch(result.__object) {
@@ -850,7 +855,10 @@ public static class NGIO {
 				// Record the current user's medal score
 				medalScore = MedalUnlockResult.medal_score;
 
+				#if !UNITY_EDITOR && UNITY_WEBGL
 				OnMedalUnlocked(MedalUnlockResult.medal.id);
+				#endif
+
 				break;
 
 			case "Medal.getMedalScore":
@@ -872,7 +880,6 @@ public static class NGIO {
 				// Store the loaded boards in our dictionary so we can get them by their ID
 				scoreBoards = new Dictionary<int, NewgroundsIO.objects.ScoreBoard>();
 				ScoreBoardGetBoardsResult.scoreboards .ForEach(board => {
-					Debug.Log(board.ToJSON());
 					scoreBoards[board.id] = board.clone();
 				});
 
@@ -889,7 +896,10 @@ public static class NGIO {
 				lastScorePosted = ScoreBoardPostScoreResult.score;
 				lastBoardPosted = GetScoreBoard(ScoreBoardPostScoreResult.scoreboard.id);
 
+				#if !UNITY_EDITOR && UNITY_WEBGL
 				OnScorePosted(ScoreBoardPostScoreResult.scoreboard.id);
+				#endif
+
 				break;
 
 			case "ScoreBoard.getScores":
