@@ -500,7 +500,7 @@ public static class NGIO {
 	/// <summary>
 	/// Loads the current DateTime from the server and returns it to an optional callback function.
 	/// </summary>
-	/// <param name="callback">A function to run when the medal has unlocked.</param>
+	/// <param name="callback">A function to run when the datetime has loaded.</param>
 	public static IEnumerator GetDateTime(Action<string,int> callback=null)
 	{
 		var component = new NewgroundsIO.components.Gateway.getDatetime();
