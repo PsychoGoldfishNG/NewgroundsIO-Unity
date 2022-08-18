@@ -40,7 +40,7 @@ namespace NewgroundsIO.objects {
 			return NewgroundsIO.SessionState.SESSION_WAITING.Contains(this.status);
 		} }
 
-		// The last time Update() was called
+		// The last time Update() was called.
 		private DateTime _lastUpdate;
 
 		// If false, Update() will end immediately when called.
@@ -49,14 +49,14 @@ namespace NewgroundsIO.objects {
 		// The status from the last time Update() was called.
 		private string _lastStatus = null;
 
-		// The mode we'lluse to check the status of this session
+		// The mode we'll use to check the status of this session.
 		private string mode = "expired";
 
 		// The total number of attempts we've tried to contact the server without success.
 		private ushort _totalAttempts = 0;
 
 		// 
-		// The max number of attempts can make to the server without success before we give up.
+		// The max number of attempts we can make to the server without success before we give up.
 		private ushort _maxAttempts = 5;
 
 		/// <summary>Constructor</summary>
@@ -104,9 +104,9 @@ namespace NewgroundsIO.objects {
 		{
 			if (!String.IsNullOrEmpty(this.passport_url)) {
 				Application.OpenURL(this.passport_url);
+				this.status = NewgroundsIO.SessionState.WAITING_FOR_USER;
+				this.mode = "check";
 			}
-			this.status = NewgroundsIO.SessionState.WAITING_FOR_USER;
-			this.mode = "check";
 		}
 
 		/// <summary>Logs the user out of their current session, locally and on the server, then calls a function when complete.</summary>
@@ -148,8 +148,6 @@ namespace NewgroundsIO.objects {
 
 			// we can skip this whole routine if we're in the middle of checking things
 			if (!this._canUpdate || this.mode == "wait") yield break;
-
-			// remember the current status so we can tell if it changes by the end of this routine
 
 			// Server is not responding as expected, it may be down...  We'll set the session back to unintialized and try again
 			if (this.status == NewgroundsIO.SessionState.SERVER_UNAVAILABLE) {
@@ -264,7 +262,7 @@ namespace NewgroundsIO.objects {
 
 		/** App.checkSession **/
 
-		/// <summary>This will call the API to see what the status of our current session is</summary
+		/// <summary>This will call the API to see what the status of our current session is</summary>
 		public IEnumerator CheckSession()
 		{
 			// don't check for any new updates while we're checking session

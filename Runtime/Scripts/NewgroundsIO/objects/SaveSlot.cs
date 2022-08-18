@@ -25,7 +25,7 @@ namespace NewgroundsIO.objects {
 		public string url { get; set; }
 
 		/// <summary>This will be true if this save slot has any saved data</summary>
-		public bool hasData { get { return this.url is not null; }}
+		public bool hasData { get { return !(this.url is null); }}
 
 
 		/// <summary>Constructor</summary>
@@ -84,7 +84,7 @@ namespace NewgroundsIO.objects {
 		public IEnumerator SetData(string data, Action<NewgroundsIO.objects.Response> callback=null)
 		{
 			if (__ngioCore is null) {
-				if (callback is not null) callback(null);
+				if (!(callback is null)) callback(null);
 				yield break;
 			}
 

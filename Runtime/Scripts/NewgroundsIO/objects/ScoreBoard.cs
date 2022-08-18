@@ -36,7 +36,7 @@ namespace NewgroundsIO.objects {
 			return cloneTo;
 		}
 
-		/// <summary>Gets a list of scores from his board.</summary>
+		/// <summary>Gets a list of scores from this board.</summary>
 		/// <param name="period">The overall period to retrieve from. Can be D, W, M, Y or A</param>
 		/// <param name="tag">An optional tag to filter on. Use null to skip filtering.</param>
 		/// <param name="social">Set to true to only see scores from friends.</param>
@@ -55,7 +55,7 @@ namespace NewgroundsIO.objects {
 			var component = new NewgroundsIO.components.ScoreBoard.getScores();
 			component.id = this.id;
 			component.period = period;
-			if (tag is not null) component.tag = tag;
+			if (!(tag is null)) component.tag = tag;
 			if (social) component.social = true;
 			if (skip > 0) component.skip = skip;
 			if (limit > 0) component.limit = limit;

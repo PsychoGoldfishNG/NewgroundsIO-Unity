@@ -60,11 +60,12 @@ namespace NewgroundsIO.objects {
 		}
 
 		/// <summary>Unlocks this medal, then fires a callback.</summary>
+		/// <param name="callback">An optional function to call when the medal is unlocked on the server.</summary>
 		public IEnumerator Unlock(Action<NewgroundsIO.objects.Response> callback=null)
 		{
 			// You can't unlock a medal without a Core object.
 			if (this.__ngioCore is null) {
-				UnityEngine.Debug.LogError("Can not unlock medal object without attaching a NewgroundsIO.Core instnce");
+				UnityEngine.Debug.LogError("NewgroundsIO - Can not unlock medal object without attaching a NewgroundsIO.Core instance.");
 				yield break;
 			}
 
