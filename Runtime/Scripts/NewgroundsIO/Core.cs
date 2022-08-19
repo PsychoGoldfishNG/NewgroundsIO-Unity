@@ -562,7 +562,7 @@ namespace NewgroundsIO {
 									break;
 
 								case "Date":
-									var dateVal = (string)jsonObj.GetValue(propName).ToString(Formatting.None);
+									var dateVal = (string)jsonObj.GetValue(propName).ToString(Formatting.None).Trim('"');
 									prop.SetValue(this, dateVal, null);
 									break;
 
