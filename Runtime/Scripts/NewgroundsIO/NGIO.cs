@@ -202,6 +202,8 @@ public static class NGIO {
 			ngioCore.debug = _debugMode;
 
 			lastConnectionStatus = STATUS_INITIALIZED;
+
+			isInitialized = true;
 		}
 	}
 
