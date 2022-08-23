@@ -60,7 +60,7 @@ public static class NGIO {
 	public static DateTime lastExecution { get; private set; } = DateTime.Now;
 
 	/// <summary>Will be true if we've called Init().</summary>
-	public static bool isInitialized { get { return ngioCore is not null; }}
+	public static bool isInitialized { get; private set; }
 
 	/// <summary>Returns true if we currently have a valid session ID.</summary>
 	public static bool hasSession { get { return session is not null && !session.expired; }}
