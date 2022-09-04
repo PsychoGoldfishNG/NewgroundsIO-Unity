@@ -25,6 +25,6 @@ Learn how to use the library, and access API docs in the [wiki](https://github.c
 You can also download an example project at [https://www.newgrounds.com/projects/games/1922418/preview](https://www.newgrounds.com/projects/games/1922418/preview)
 
 # Join the Discord!
-You can find additional help, and show of your Newgrounds.io games in our little community of developers.  
+You can find additional help, and show off your Newgrounds.io games in our little community of developers.  
 
 [Join Now!](https://discord.gg/wcsCk2ErhH)
