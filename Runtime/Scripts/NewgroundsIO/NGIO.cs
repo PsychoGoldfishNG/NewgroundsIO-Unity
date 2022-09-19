@@ -1,3 +1,8 @@
+// External events
+#if !UNITY_EDITOR
+#define UNITY_BUILD
+#endif
+
 using System;
 using System.Globalization;
 using System.Collections;
@@ -147,11 +152,6 @@ public static class NGIO {
 	private static bool _sessionReady = false;
 	private static bool _skipLogin = false;
 	private static bool _checkingConnectionStatus = false;
-
-	// External events
-	#if !UNITY_EDITOR
-	#define UNITY_BUILD
-	#endif
 
 	// tells the Newgrounds page a medal was unlocked so it can highlight in real time
 	// only used in WebGL builds
