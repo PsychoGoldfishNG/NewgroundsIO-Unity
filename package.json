@@ -1,6 +1,6 @@
 {
   "name": "io.newgrounds.unity",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "displayName": "Newgrounds.io",
   "description": "A C# Library for accessing the Newgrounds.io API from Unity games.",
   "unity": "2021.3",
@@ -28,6 +28,7 @@
   ],
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.0.2",
+    "com.unity.settings-manager": "2.0.1",
     "com.unity.textmeshpro": "3.0.6"
   },
   "type": "library"
