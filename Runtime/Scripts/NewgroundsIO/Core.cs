@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Web;
 using System.Security.Cryptography;
 using System.IO;
+using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -152,7 +152,7 @@ namespace NewgroundsIO {
 			request.SetCore(this);
 			request.RequiresSession(component.__requireSession);
 
-			Application.OpenURL(GATEWAY_URI+"?input="+HttpUtility.UrlEncode(request.ToJSON()));
+			Application.OpenURL(GATEWAY_URI+"?input="+WebUtility.UrlEncode(request.ToJSON()));
 		}
 
 		/// <summary>Encrypts a JSON-encoded string and encodes it to a base64 string.</summary>
