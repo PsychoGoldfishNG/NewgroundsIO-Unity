@@ -1,19 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TestSceneBehaviour : MonoBehaviour
 {
-    // Start is called before the first frame update
+    const string FirstSceneName = "LoaderScene";
+    
+    [SerializeField] Button BackButton;
+
     void Start()
     {
-
+        BackButton.onClick.AddListener(this.GoBack);
     }
 
-    // Update is called once per frame
+    void GoBack()
+    {
+        SceneManager.LoadScene(FirstSceneName, LoadSceneMode.Single);
+    }
+
     void Update()
     {
-        // keep the session from expiring while we play
+        // Keep the session from expiring while we play
         StartCoroutine(NGIO.KeepSessionAlive());
     }
 }

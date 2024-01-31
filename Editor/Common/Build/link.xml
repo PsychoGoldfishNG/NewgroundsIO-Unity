@@ -1,0 +1,3 @@
+﻿<linker>
+    <assembly fullname="Newgrounds.Runtime" preserve="all"/>
+</linker>

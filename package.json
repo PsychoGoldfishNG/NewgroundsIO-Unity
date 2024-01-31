@@ -1,6 +1,6 @@
 {
   "name": "io.newgrounds.unity",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "displayName": "Newgrounds.io",
   "description": "A C# Library for accessing the Newgrounds.io API from Unity games.",
   "unity": "2021.3",

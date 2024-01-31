@@ -1,12 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.Networking;
-using TMPro;
 
 /** 
  * This is a fake title screen demonstrating how you might 
@@ -14,6 +10,8 @@ using TMPro;
  */
 public class TitleScreenBehaviour : MonoBehaviour
 {
+    const string MainSceneName = "TestScene";
+
     [Header("Main Menu")]
     public GameObject MainMenuWrapper;
     public Button NewGameButton;
@@ -47,23 +45,24 @@ public class TitleScreenBehaviour : MonoBehaviour
             {3, SaveSlot3Object}
         };
 
-        foreach(var (id, slot) in SaveSlots) {
+        foreach((int id, SaveSlot slot) in SaveSlots) {
             slot.GetData += OnSaveSlotLoaded;
         }
 
         // hide all of our UI elements while NGIO stuff is loading
         HideMenus();
+        if (NGIO.hasUser)
+        {
+            ShowMainMenu();
+            RefreshSaveSlots();
+        }
     }
 
     // this will be called once the API has finished loading everything
     public void OnNewgroundsIOReady(BaseEventData e)
     {
         ShowMainMenu();
-
-        foreach(var (id, slot) in SaveSlots)
-        {
-            slot.Refresh();
-        }
+        RefreshSaveSlots();
     }
 
     public void SetMenuVisibility(bool mainMenu=true, bool continueMenu=true)
@@ -75,6 +74,14 @@ public class TitleScreenBehaviour : MonoBehaviour
     public void HideMenus()
     {
         SetMenuVisibility(false,false);
+    }
+
+    public void RefreshSaveSlots()
+    {
+        foreach((int id, SaveSlot slot) in SaveSlots)
+        {
+            slot.Refresh();
+        }
     }
 
     public void ShowMainMenu() 
@@ -108,7 +115,7 @@ public class TitleScreenBehaviour : MonoBehaviour
     }
 
     public void StartGame() {
-        SceneManager.LoadScene("TestScene", LoadSceneMode.Single);
+        SceneManager.LoadScene(MainSceneName, LoadSceneMode.Single);
     }
 
     public void OnMoreGamesButtonClicked() {

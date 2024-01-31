@@ -170,8 +170,7 @@ public class NgioAppConnector : MonoBehaviour
         } else {
 
             // There's a newer version of the game available
-            if (NGIO.isDeprecated) 
-                NewVersionAvailableButton.SetActive(true);
+            if (NGIO.isDeprecated) NewVersionAvailableButton.SetActive(true);
         
             switch(status) {
 
@@ -231,16 +230,24 @@ public class NgioAppConnector : MonoBehaviour
     /// </summary>
     public void HideUIElements()
     {
-        if (PleaseLogInText is not null) PleaseLogInText.SetActive(false);
-        if (LoggedInText is not null) LoggedInText.SetActive(false);
-        if (PleaseWaitObject is not null) PleaseWaitObject.SetActive(false);
-        if (HostIsIllegalText is not null) HostIsIllegalText.SetActive(false);
-        if (LoginButton is not null) LoginButton.SetActive(false);
-        if (DontLoginButton is not null) DontLoginButton.SetActive(false);
-        if (CancelLoginButton is not null) CancelLoginButton.SetActive(false);
-        if (LogoutButton is not null) LogoutButton.SetActive(false);
-        if (PlayLegalVersionButton is not null) PlayLegalVersionButton.SetActive(false);
-        if (NewVersionAvailableButton is not null) NewVersionAvailableButton.SetActive(false);
+        GameObject[] elements =
+        {
+            PleaseLogInText,
+            LoggedInText,
+            PleaseWaitObject,
+            HostIsIllegalText,
+            LoginButton,
+            DontLoginButton,
+            CancelLoginButton,
+            LogoutButton,
+            PlayLegalVersionButton,
+            NewVersionAvailableButton,
+        };
+        
+        foreach (GameObject uiElement in elements)
+        {
+            if (uiElement is not null) uiElement.SetActive(false);
+        }
     }
 
     /// <summary>
