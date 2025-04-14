@@ -424,7 +424,8 @@ public static class NGIO {
 
 	/// <summary>
 	/// Call this in your game loop to prevent sessions from expiring.
-	/// This will only hit the server once every 10 seconds, no matter how often you call it.
+	/// This will only hit the server once every 30 seconds, no matter how often you call it.
+	/// </summary>
 	public static IEnumerator KeepSessionAlive()
 	{
 		if (!hasUser) yield break;
