@@ -153,8 +153,9 @@ public static class NGIO {
 	private static bool _skipLogin = false;
 	private static bool _checkingConnectionStatus = false;
 
-	// tells the Newgrounds page a medal was unlocked so it can highlight in real time
-	// only used in WebGL builds
+#if UNITY_WEBGL && !UNITY_EDITOR
+    // tells the Newgrounds page a medal was unlocked so it can highlight in real time
+    // only used in WebGL builds
 	[DllImport("__Internal"), Conditional("UNITY_BUILD"), Conditional("UNITY_WEBGL")]
 	private static extern void OnMedalUnlocked(int medal_id);
 
@@ -162,6 +163,7 @@ public static class NGIO {
 	// only used in WebGL builds
 	[DllImport("__Internal"), Conditional("UNITY_BUILD"), Conditional("UNITY_WEBGL")]
 	private static extern void OnScorePosted(int board_id);
+#endif
 
 	/** ============================= Misc Public Methods ============================ **/
 
@@ -858,9 +860,9 @@ public static class NGIO {
 				// Record the current user's medal score
 				medalScore = MedalUnlockResult.medal_score;
 
-				#if !UNITY_EDITOR && UNITY_WEBGL
+#if !UNITY_EDITOR && UNITY_WEBGL
 				OnMedalUnlocked(MedalUnlockResult.medal.id);
-				#endif
+#endif
 
 				break;
 
@@ -899,9 +901,9 @@ public static class NGIO {
 				lastScorePosted = ScoreBoardPostScoreResult.score;
 				lastBoardPosted = GetScoreBoard(ScoreBoardPostScoreResult.scoreboard.id);
 
-				#if !UNITY_EDITOR && UNITY_WEBGL
+#if !UNITY_EDITOR && UNITY_WEBGL
 				OnScorePosted(ScoreBoardPostScoreResult.scoreboard.id);
-				#endif
+#endif
 
 				break;
 
